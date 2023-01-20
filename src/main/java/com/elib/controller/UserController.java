@@ -1,7 +1,5 @@
 package com.elib.controller;
 
-import java.sql.ResultSet;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,24 +27,22 @@ public class UserController {
 	@GetMapping(value = "/verify", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> UserVerify(@RequestBody User user) {
 		try {
-			logger.info("user verify Controller Entry");
-			if (String.valueOf(user.getCustomerId()).length() == 6) {
-				logger.info("userid = " + user.getCustomerId());
-				ResultSet result = userdb.getPassword(user.getCustomerId());
-				if (result.next()) {
-					return response.generateResponse("password data succefully retrived", HttpStatus.OK,
-							result.getString("CUSTOMER_PASSWORD"));
-				} else {
-					System.out.println("invalid details");
-					return response.generateResponse("No Data found", HttpStatus.NOT_FOUND, null);
-				}
+			logger.info("user verify API Entry");
+			logger.info("userid = " + user.getCustomerId());
+			String password = userdb.getPassword(user.getCustomerId());
+			if (password == null) {
+				logger.info("user verify API Exit");
+				return response.generateResponse("No Data found", HttpStatus.NOT_FOUND, null);
 			} else {
-				System.out.println("invalid details");
-				return response.generateResponse("User id length not matching", HttpStatus.NOT_FOUND, null);
+				logger.info("user verify API Exit");
+				return response.generateResponse("password data succefully retrived", HttpStatus.OK, password);
 			}
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
+			logger.error(e);
 			return response.generateResponse(e.toString(), HttpStatus.NOT_FOUND, null);
 		} catch (Exception e) {
+			logger.error(e);
 			return response.generateResponse(e.toString(), HttpStatus.NOT_FOUND, null);
 		}
 	}

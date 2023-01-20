@@ -27,25 +27,40 @@ public class BooksController {
 	ResponseHandler response;
 	Logger logger = LogManager.getLogger("ElibraryFlowProject");
 
-	
 	@GetMapping(value = "/getcategories", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> getCategory() {
 		try {
+			logger.info("user get Categories API Entry");
 			List<Category> categories = userdb.getCategories();
-			return response.generateResponse("Categories fetched succefully", HttpStatus.OK, categories);
+			if (categories.isEmpty()) {
+				logger.info("user get Categories API Exit");
+				return response.generateResponse("no category found", HttpStatus.NOT_FOUND, null);
+			} else {
+				logger.info("user get Categories API Exit");
+				return response.generateResponse("Categories fetched succefully", HttpStatus.OK, categories);
+			}
+
 		} catch (Exception e) {
+			logger.error(e);
 			return response.generateResponse(e.toString(), HttpStatus.NOT_FOUND, null);
-
 		}
-
 	}
 
-	@GetMapping(value = "/getbooks", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getbooks", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> getBooks(@RequestBody Category category) {
 		try {
+			logger.info("user get Books API Entry");
 			List<BookProduct> books = userdb.getBooksbyCategory(category.getCategoryId());
-			return response.generateResponse("Books fetched successfully", HttpStatus.OK, books);
+			if (books.isEmpty()) {
+				logger.info("user get Books API Exit");
+				return response.generateResponse("no books found", HttpStatus.NOT_FOUND, null);
+			} else {
+				logger.info("user get Books API Exit");
+				return response.generateResponse("Books fetched successfully", HttpStatus.OK, books);
+			}
+
 		} catch (Exception e) {
+			logger.error(e);
 			return response.generateResponse(e.toString(), HttpStatus.NOT_FOUND, null);
 		}
 	}

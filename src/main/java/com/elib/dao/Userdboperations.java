@@ -22,7 +22,7 @@ public class Userdboperations {
 	@Autowired
 	DataSourceProperty datasource;
 	Logger logger = LogManager.getLogger("ElibraryFlowProject");
-	
+
 	public ResultSet getUserId(int userid) {
 		try {
 			logger.info("userDetail Check");
@@ -31,32 +31,38 @@ public class Userdboperations {
 			PreparedStatement prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_PASSWORD @id =?");
 			prepareStatement.setInt(1, userid);
 			ResultSet resultSet = prepareStatement.executeQuery();
-			System.out.println("query executed");
+			logger.info("query executed");
 			return resultSet;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
 	}
 
-	public ResultSet getPassword(int userid) {
+	public String getPassword(int userid) {
 		try {
-			System.out.println("userId Check");
+			logger.info("get Password method Entry");
 			Connection connection = datasource.getDBConnection();
 			System.out.println("DB connection");
 			PreparedStatement prepareStatement;
 			prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_PASSWORD @id =?");
 			prepareStatement.setInt(1, userid);
 			ResultSet resultSet = prepareStatement.executeQuery();
-			return resultSet;
+			logger.info("query executed");
+			if (resultSet.next()) {
+				return resultSet.getString("CUSTOMER_PASSWORD");
+			} else {
+				return null;
+			}
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
+			return null;
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
+			return null;
 		}
-		return null;
 
 	}
 
@@ -72,9 +78,9 @@ public class Userdboperations {
 			ResultSet resultSet = prepareStatement.executeQuery();
 			return resultSet;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
 	}
@@ -92,9 +98,9 @@ public class Userdboperations {
 			int insertCount = prepareStatement.executeUpdate();
 			return insertCount;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return 0;
 
@@ -113,9 +119,9 @@ public class Userdboperations {
 			}
 			return list;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
 	}
@@ -137,9 +143,9 @@ public class Userdboperations {
 			}
 			return list;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
 	}
@@ -163,11 +169,35 @@ public class Userdboperations {
 			}
 			return cartItems;
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
+	}
+
+	public ResultSet checkCartItem(int userid, String bookName) {
+
+		try {
+			Connection connection = datasource.getDBConnection();
+			System.out.println("DB connection");
+			PreparedStatement prepareStatement;
+			prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_CHECK_CART @id=?,@book=?");
+			prepareStatement.setInt(1, userid);
+			prepareStatement.setString(2, bookName);
+			ResultSet result = prepareStatement.executeQuery();
+			if (result.next()) {
+				return result;
+			} else {
+				return null;
+			}
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return null;
+
 	}
 
 	public BookProduct getBookByName(String bookName) {
@@ -189,15 +219,15 @@ public class Userdboperations {
 				return null;
 			}
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
 		return null;
 
 	}
 
-	public int addToCart(String bookName, int bookQuantity, double bookPrice, int userid) {
+	public boolean addToCart(String bookName, int bookQuantity, double bookPrice, int userid) {
 		try {
 			Connection connection = datasource.getDBConnection();
 			System.out.println("DB connection");
@@ -207,30 +237,105 @@ public class Userdboperations {
 			prepareStatement.setInt(2, bookQuantity);
 			prepareStatement.setDouble(3, bookPrice);
 			prepareStatement.setInt(4, userid);
-			int executeUpdate = prepareStatement.executeUpdate();
-			return executeUpdate;
+			if (prepareStatement.executeUpdate() < 1) {
+				return false;
+			} else {
+				return true;
+			}
+
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
-		return 0;
+		return false;
 	}
-	public int updateCart(String bookname) {
+
+	public boolean cartRemove(String bookname, int userid) {
 		try {
 			Connection connection = datasource.getDBConnection();
 			System.out.println("DB connection");
 			PreparedStatement prepareStatement = connection
-					.prepareStatement("EXEC KALEESWARAN_UPDATE_CART @name=");
+					.prepareStatement("EXEC KALEESWARAN_DELETE_PRODUCT @name=?,@id=?");
 			prepareStatement.setString(1, bookname);
-			int executeUpdate = prepareStatement.executeUpdate();
-			return executeUpdate;
+			prepareStatement.setInt(2, userid);
+			if (prepareStatement.executeUpdate() < 1) {
+				return false;
+			} else {
+				return true;
+			}
 		} catch (SQLException e) {
-			System.out.println(e);
+			logger.error(e);
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e);
 		}
-		return 0;
+		return false;
+
+	}
+
+	public boolean cartAddCount(String bookName, int Quantity, double Price, int userid) {
+		try {
+			ResultSet result = checkCartItem(userid, bookName);
+			if (result == null) {
+				return addToCart(bookName, Quantity, Price, userid);
+			} else {
+				int bookCount = result.getInt("BOOK_QUANTITY") + Quantity;
+				BookProduct bookByName = getBookByName(bookName);
+				if (bookCount > bookByName.getBookQuantity()) {
+					return false;
+				} else {
+					double bookPrice = bookCount * bookByName.getBookPrice();
+					Connection connection = datasource.getDBConnection();
+					System.out.println("DB connection");
+					PreparedStatement prepareStatement = connection
+							.prepareStatement("EXEC KALEESWARAN_MODIFY_CART @name=?,@id=?,@quantity=?,@price=?");
+					prepareStatement.setString(1, bookName);
+					prepareStatement.setInt(2, userid);
+					prepareStatement.setInt(3, bookCount);
+					prepareStatement.setDouble(4, bookPrice);
+					return true;
+				}
+
+			}
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return false;
+
+	}
+
+	public boolean CartReduce(String bookName, int Quantity, double Price, int userid) {
+		try {
+			ResultSet result = checkCartItem(userid, bookName);
+			int bookCount = result.getInt("BOOK_QUANTITY");
+			BookProduct bookByName = getBookByName(bookName);
+			if (bookCount - Quantity == 0) {
+				return cartRemove(bookName, userid);
+			} 
+			else if (bookCount - Quantity<0) {
+				return false;
+			}
+			else {
+				double bookPrice = (bookCount-Quantity) * bookByName.getBookPrice();
+				Connection connection = datasource.getDBConnection();
+				System.out.println("DB connection");
+				PreparedStatement prepareStatement = connection
+						.prepareStatement("EXEC KALEESWARAN_MODIFY_CART @name=?,@id=?,@quantity=?,@price=?");
+				prepareStatement.setString(1, bookName);
+				prepareStatement.setInt(2, userid);
+				prepareStatement.setInt(3, (bookCount-Quantity));
+				prepareStatement.setDouble(4, bookPrice);
+				return true;
+			}
+
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return false;
 
 	}
 
