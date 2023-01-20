@@ -1,20 +1,23 @@
 package com.elib.util;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class DataSourceProperty {
 
 	static BasicDataSource dataSource;
+	static 	Logger logger = LogManager.getLogger("ElibraryFlowProject");
 
-	public static BasicDataSource getDataSource() throws IOException {
+	public static BasicDataSource getDataSource() {
+		
 		try {
 			if (dataSource == null) {
 				FileInputStream file = new FileInputStream(
@@ -30,18 +33,20 @@ public class DataSourceProperty {
 				ds.setUrl(connectionurl);
 				ds.setUsername(username);
 				ds.setPassword(password);
+				logger.info("driverjdbc = "+driver+"connectionUrl = "+connectionurl+"username = "+username+"password"+password);
 				ds.setMinIdle(5);
 				ds.setMaxIdle(10);
 				ds.setMaxTotal(25);
 				dataSource = ds;
 				return dataSource;
-			}
+			} 
 			else {
-				System.out.println("data source already assigned");
+				logger.info("data source already assigned");
+				return dataSource;
 			}
 
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.info(e);
 		}
 		return dataSource;
 	}
@@ -51,9 +56,10 @@ public class DataSourceProperty {
 			return getDataSource().getConnection();
 
 		} catch (SQLException e) {
-			System.out.println(e);
-		} catch (IOException e) {
-			System.out.println(e);
+			logger.error(e);
+		}
+		catch (Exception e) {
+			logger.error(e);
 		}
 		return null;
 	}

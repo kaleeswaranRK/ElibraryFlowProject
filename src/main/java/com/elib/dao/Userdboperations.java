@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +21,11 @@ import com.elib.util.DataSourceProperty;
 public class Userdboperations {
 	@Autowired
 	DataSourceProperty datasource;
-
+	Logger logger = LogManager.getLogger("ElibraryFlowProject");
+	
 	public ResultSet getUserId(int userid) {
 		try {
-			System.out.println("userDetail Check");
+			logger.info("userDetail Check");
 			Connection connection = datasource.getDBConnection();
 			System.out.println("DB connection");
 			PreparedStatement prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_PASSWORD @id =?");

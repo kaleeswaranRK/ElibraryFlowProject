@@ -2,6 +2,8 @@ package com.elib.controller;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,13 +19,16 @@ import com.elib.model.Category;
 import com.elib.util.ResponseHandler;
 
 @RestController
-@RequestMapping("/book")
+@RequestMapping("/product")
 public class BooksController {
 	@Autowired
 	Userdboperations userdb;
 	@Autowired
 	ResponseHandler response;
-	@GetMapping(value = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
+	Logger logger = LogManager.getLogger("ElibraryFlowProject");
+
+	
+	@GetMapping(value = "/getcategories", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> getCategory() {
 		try {
 			List<Category> categories = userdb.getCategories();
@@ -35,7 +40,7 @@ public class BooksController {
 
 	}
 
-	@GetMapping(value = "/books", produces = MediaType.APPLICATION_JSON_VALUE)
+	@GetMapping(value = "/getbooks", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> getBooks(@RequestBody Category category) {
 		try {
 			List<BookProduct> books = userdb.getBooksbyCategory(category.getCategoryId());
