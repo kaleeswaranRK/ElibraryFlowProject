@@ -33,6 +33,7 @@ public class UserController {
 			if (password == null) {
 				logger.info("user verify API Exit");
 				return response.generateResponse("No Data found", HttpStatus.NOT_FOUND, null);
+				
 			} else {
 				logger.info("user verify API Exit");
 				return response.generateResponse("password data succefully retrived", HttpStatus.OK, password);

@@ -1,11 +1,25 @@
 package com.elib.model;
 
-import org.json.JSONObject;
+import java.sql.Timestamp;
 
 public class Response {
 	private String message;
 	private String status;
-	private JSONObject json;
+	private Object data;
+	private Timestamp dateTime;
+
+	public Response(String message, String status, Object data, Timestamp dateTime) {
+		this.message = message;
+		this.status = status;
+		this.data = data;
+		this.dateTime = dateTime;
+	}
+	public Timestamp getDateTime() {
+		return dateTime;
+	}
+	public void setDateTime(Timestamp dateTime) {
+		this.dateTime = dateTime;
+	}
 
 	public String getMessage() {
 		return message;
@@ -14,32 +28,17 @@ public class Response {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-
-	public JSONObject getJson() {
-		return json;
-	}
-
-	public void setJson(JSONObject json) {
-		this.json = json;
-	}
-
-	public Response(String message, String status, JSONObject json) {
-		super();
-		this.message = message;
-		this.status = status;
-		this.json = json;
-	}
-
-	@Override
-	public String toString() {
-		return "Response [message=" + message + ", status=" + status + ", json=" + json + "]";
-	}
-
 	public String getStatus() {
 		return status;
 	}
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public Object getData() {
+		return data;
+	}
+	public void setData(Object data) {
+		this.data = data;
 	}
 }

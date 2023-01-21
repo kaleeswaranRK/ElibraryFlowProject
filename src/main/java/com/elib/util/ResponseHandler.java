@@ -8,17 +8,17 @@ import java.util.Map;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 @Configuration
 public class ResponseHandler {
 
 	public ResponseEntity<Object> generateResponse(String message, HttpStatus status, Object responseObj) {
-		
-        Map<String, Object> map = new HashMap<String, Object>();
-            map.put("message", message);
-            map.put("status", status.value());
-            map.put("data", responseObj);
-            map.put("Date", new Timestamp(new Date().getTime()));
 
-            return new ResponseEntity<Object>(map,status);
-    }
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("message", message);
+		map.put("status", status.value());
+		map.put("data", responseObj);
+		map.put("Date", new Timestamp(new Date().getTime()));
+		return new ResponseEntity<Object>(map, status);
+	}
 }
