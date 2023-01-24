@@ -5,19 +5,20 @@ public class BookCart {
 	private BookProduct book;
 	private int quantity;
 	private double price;
-	private User userId;
+	private User user;
 
 	@Override
 	public String toString() {
 		return "BookCart [bookCartId=" + bookCartId + ", book=" + book + ", quantity=" + quantity + ", price=" + price
-				+ ", userId=" + userId + "]";
+				+ ", userId=" + user + "]";
 	}
 
-	public BookCart(int bookCartId, BookProduct book, int quantity, double price) {
+	public BookCart(int bookCartId, BookProduct book, int quantity, double price, User user) {
 		this.bookCartId = bookCartId;
 		this.book = book;
 		this.quantity = quantity;
 		this.price = price;
+		this.user = user;
 	}
 
 	public int getBookCartId() {
@@ -49,11 +50,11 @@ public class BookCart {
 		this.book = book;
 	}
 
-	public User getUserId() {
-		return userId;
+	public User getUser() {
+		return user;
 	}
 
-	public void setUserId(User userId) {
-		this.userId = userId;
+	public void setUser(User user) {
+		this.user = user;
 	}
 }

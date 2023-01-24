@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 import com.elib.model.BookCart;
 import com.elib.model.BookProduct;
 import com.elib.model.Category;
+import com.elib.model.User;
 import com.elib.util.DataSourceProperty;
 
 @Service
 public class Userdboperations {
 	@Autowired
 	DataSourceProperty datasource;
-	Logger logger = LogManager.getLogger("ElibraryFlowProject");
+	Logger logger = LogManager.getLogger(Userdboperations.class);
 
-	
 	public String getPassword(int userid) {
 		try {
 			logger.info("get Password method Entry");
@@ -37,13 +37,12 @@ public class Userdboperations {
 			if (resultSet.next()) {
 				logger.info("get Password method Exit");
 				return resultSet.getString("CUSTOMER_PASSWORD");
-			} 
-			else {
+			} else {
 				logger.info("get Password method Exit");
 				return null;
 			}
 		} catch (SQLException e) {
-			logger.error(e);	
+			logger.error(e);
 		} catch (Exception e) {
 			logger.error(e);
 		}
@@ -51,7 +50,31 @@ public class Userdboperations {
 
 	}
 
-	
+	public String getUser(int userid) {
+		try {
+			logger.info("get Password method Entry");
+			Connection connection = datasource.getDBConnection();
+			logger.info("DB connection Establised");
+			PreparedStatement prepareStatement;
+			prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_PASSWORD @id =?");
+			prepareStatement.setInt(1, userid);
+			ResultSet resultSet = prepareStatement.executeQuery();
+			logger.info("query executed");
+			if (resultSet.next()) {
+				logger.info("get Password method Exit");
+				return resultSet.getString("CUSTOMER_PASSWORD");
+			} else {
+				logger.info("get Password method Exit");
+				return null;
+			}
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return null;
+
+	}
 
 	public List<Category> getCategories() {
 		try {
@@ -76,6 +99,31 @@ public class Userdboperations {
 		return null;
 	}
 
+	public Category getCategory(int categoryid) {
+		try {
+			logger.info("getCategory method Entry");
+			Connection connection = datasource.getDBConnection();
+			logger.info("DB connection Establised");
+			PreparedStatement prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_CATEGORY @id=?");
+			prepareStatement.setInt(1, categoryid);
+			ResultSet categoryresult = prepareStatement.executeQuery();
+			if (categoryresult.next()) {
+				Category category = new Category(categoryresult.getInt("CATEGORY_ID"),
+						categoryresult.getString("CATEGORY_NAME"));
+				logger.info("getCategory method Exit");
+				return category;
+			} else {
+				return null;
+			}
+
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return null;
+	}
+
 	public List<BookProduct> getBooksbyCategory(int categoryid) {
 		try {
 			logger.info("get book by Category method Entry");
@@ -89,8 +137,8 @@ public class Userdboperations {
 			logger.info("query executed");
 			while (result.next()) {
 				BookProduct book = new BookProduct(result.getInt("BOOK_ID"), result.getString("BOOK_NAME"),
-						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"),
-						result.getDouble("BOOK_PRICE"));
+						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"), result.getDouble("BOOK_PRICE"),
+						getCategory(result.getInt("CATEGORY_ID")));
 				list.add(book);
 			}
 			logger.info("get book by Category method Exit");
@@ -113,13 +161,15 @@ public class Userdboperations {
 			prepareStatement.setInt(1, userid);
 			ResultSet result = prepareStatement.executeQuery();
 			logger.info("query executed");
+			
 			while (result.next()) {
+				User user= new User(userid,null,null);
 				String bookName = result.getString("BOOK_NAME");
 				System.out.println("BookName = " + bookName);
 				BookProduct book = getBookByName(bookName);
 				System.out.println(book.toString());
 				BookCart cartItem = new BookCart(result.getInt("BOOK_CART_ID"), book, result.getInt("BOOK_QUANTITY"),
-						result.getDouble("BOOK_PRICE"));
+						result.getDouble("BOOK_PRICE"), user);
 				cartItems.add(cartItem);
 			}
 			logger.info("get cart items method Exit");
@@ -170,8 +220,8 @@ public class Userdboperations {
 			logger.info("query executed");
 			if (result.next()) {
 				book = new BookProduct(result.getInt("BOOK_ID"), result.getString("BOOK_NAME"),
-						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"),
-						result.getDouble("BOOK_PRICE"));
+						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"), result.getDouble("BOOK_PRICE"),
+						getCategory(result.getInt("CATEGORY_ID")));
 				logger.info("getBookByName method Exit");
 				return book;
 			} else {
@@ -250,14 +300,11 @@ public class Userdboperations {
 			ResultSet result = checkCartItem(userid, bookName);
 			if (result.next()) {
 				int bookCount = result.getInt("BOOK_QUANTITY") + Quantity;
-				System.out.println(bookCount);
 				BookProduct bookByName = getBookByName(bookName);
-				System.out.println(bookName);
 				if (bookCount > bookByName.getBookQuantity()) {
 					return false;
 				} else {
 					double bookPrice = bookCount * bookByName.getBookPrice();
-					System.out.println(bookPrice);
 					Connection connection = datasource.getDBConnection();
 					logger.info("DB connection Establised");
 					PreparedStatement prepareStatement = connection
@@ -294,36 +341,35 @@ public class Userdboperations {
 			logger.info("CartReduce method Entry");
 			ResultSet result = checkCartItem(userid, bookName);
 			if (result.next()) {
-			int bookCount = result.getInt("BOOK_QUANTITY");
-			BookProduct bookByName = getBookByName(bookName);
-			if (bookCount - Quantity == 0) {
-				logger.info("CartReduce method Exit");
-				return cartRemove(bookName, userid);
-			} else if (bookCount - Quantity < 0) {
-				logger.info("CartReduce method Exit");
-				return false;
-			} else {
-				double bookPrice = (bookCount - Quantity) * bookByName.getBookPrice();
-				Connection connection = datasource.getDBConnection();
-				logger.info("DB connection Establised");
-				PreparedStatement prepareStatement = connection
-						.prepareStatement("EXEC KALEESWARAN_MODIFY_CART @name=?,@id=?,@quantity=?,@price=?");
-				prepareStatement.setString(1, bookName);
-				prepareStatement.setInt(2, userid);
-				prepareStatement.setInt(3, (bookCount - Quantity));
-				prepareStatement.setDouble(4, bookPrice);
-				if (prepareStatement.executeUpdate() < 1) {
-					logger.info("query executed");
+				int bookCount = result.getInt("BOOK_QUANTITY");
+				BookProduct bookByName = getBookByName(bookName);
+				if (bookCount - Quantity == 0) {
+					logger.info("CartReduce method Exit");
+					return cartRemove(bookName, userid);
+				} else if (bookCount - Quantity < 0) {
 					logger.info("CartReduce method Exit");
 					return false;
 				} else {
-					logger.info("query executed");
-					logger.info("CartReduce method Exit");
-					return true;
+					double bookPrice = (bookCount - Quantity) * bookByName.getBookPrice();
+					Connection connection = datasource.getDBConnection();
+					logger.info("DB connection Establised");
+					PreparedStatement prepareStatement = connection
+							.prepareStatement("EXEC KALEESWARAN_MODIFY_CART @name=?,@id=?,@quantity=?,@price=?");
+					prepareStatement.setString(1, bookName);
+					prepareStatement.setInt(2, userid);
+					prepareStatement.setInt(3, (bookCount - Quantity));
+					prepareStatement.setDouble(4, bookPrice);
+					if (prepareStatement.executeUpdate() < 1) {
+						logger.info("query executed");
+						logger.info("CartReduce method Exit");
+						return false;
+					} else {
+						logger.info("query executed");
+						logger.info("CartReduce method Exit");
+						return true;
+					}
 				}
-			}
-			}
-			else {
+			} else {
 				logger.info("CartReduce method Exit");
 				return false;
 			}

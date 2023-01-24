@@ -8,12 +8,16 @@ public class BookProduct {
 	private double bookPrice;
 	private Category category;
 
-	public BookProduct(int bookID, String bookName, String authorName, int bookQuantity, double bookPrice) {
+	
+	public BookProduct(int bookID, String bookName, String authorName, int bookQuantity, double bookPrice,
+			Category category) {
+		super();
 		this.bookID = bookID;
 		this.bookName = bookName;
 		this.authorName = authorName;
 		this.bookQuantity = bookQuantity;
 		this.bookPrice = bookPrice;
+		this.category = category;
 	}
 
 	public BookProduct() {

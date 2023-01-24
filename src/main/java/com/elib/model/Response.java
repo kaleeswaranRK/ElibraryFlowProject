@@ -2,24 +2,14 @@ package com.elib.model;
 
 import java.sql.Timestamp;
 
+import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
+
 public class Response {
 	private String message;
 	private String status;
-	private Object data;
-	private Timestamp dateTime;
-
-	public Response(String message, String status, Object data, Timestamp dateTime) {
-		this.message = message;
-		this.status = status;
-		this.data = data;
-		this.dateTime = dateTime;
-	}
-	public Timestamp getDateTime() {
-		return dateTime;
-	}
-	public void setDateTime(Timestamp dateTime) {
-		this.dateTime = dateTime;
-	}
+	private String data;
+	private String dateTime;
 
 	public String getMessage() {
 		return message;
@@ -28,17 +18,28 @@ public class Response {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+
 	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStatus(HttpStatus status) {
+		this.status = String.valueOf(status.value());
 	}
-	public Object getData() {
+
+	public String getData() {
 		return data;
 	}
-	public void setData(Object data) {
-		this.data = data;
+
+	public void setData(JSONObject json) {
+		this.data = String.valueOf(json);
+	}
+
+	public String getDateTime() {
+		return dateTime;
+	}
+
+	public void setDateTime(Timestamp dateTime) {
+		this.dateTime = String.valueOf(dateTime);
 	}
 }
