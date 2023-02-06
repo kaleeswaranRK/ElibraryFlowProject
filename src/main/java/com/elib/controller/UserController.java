@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.elib.dao.Userdboperations;
 import com.elib.model.Response;
-import com.elib.model.User;
 import com.elib.util.ResponseHandler;
 
 @RestController
@@ -28,27 +27,26 @@ public class UserController {
 	@Autowired
 	ResponseHandler response;
 
-	@GetMapping(value = "/verify", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public Response UserVerify(@RequestBody User user) {
+	@GetMapping(value = "/verify/{user}",produces = MediaType.APPLICATION_JSON_VALUE)
+	public Response UserVerify(@PathVariable String user) {
 		Response res = new Response();
 		try {
 			logger.info("user verify API Entry");
-			logger.info("userid = " + user.getCustomerId());
-			String password = userdb.getPassword(user.getCustomerId());
+			logger.info("userid = " + Integer.parseInt(user));
+			String password = userdb.getPassword(Integer.parseInt(user));
 			if (password == null) {
 				logger.info("user verify API Exit");
 				res.setMessage("No data Found");
 				res.setStatus(HttpStatus.NOT_FOUND);
 				res.setDateTime(new Timestamp(new Date().getTime()));
-				res.setData(null);
 				return res;
 
 			} else {
 				logger.info("user verify API Exit");
-				res.setMessage("password data succefully retrived");
+				res.setMessage("success");
 				res.setStatus(HttpStatus.OK);
 				res.setDateTime(new Timestamp(new Date().getTime()));
-				res.setData(new JSONObject().put("hash", password));
+				res.setData(new JSONObject().put("Result", password));
 				return res;
 			}
 		} catch (NumberFormatException e) {
@@ -57,7 +55,6 @@ public class UserController {
 			res.setMessage("data fetching not successfull");
 			res.setStatus(HttpStatus.NOT_FOUND);
 			res.setDateTime(new Timestamp(new Date().getTime()));
-			res.setData(null);
 			return res;
 		} catch (Exception e) {
 			logger.error(e);
@@ -65,7 +62,6 @@ public class UserController {
 			res.setMessage("data fetching not successfull");
 			res.setStatus(HttpStatus.NOT_FOUND);
 			res.setDateTime(new Timestamp(new Date().getTime()));
-			res.setData(null);
 			return res;
 		}
 

@@ -17,7 +17,7 @@ public class DataSourceProperty {
 	@Autowired
 	PropertyCheck propertycheck;
 	static BasicDataSource dataSource;
-	File file = new File("C:\\Users\\User\\Desktop\\Kaleeswaran\\ElibraryFiles\\prop.properties");
+	static File file = new File("C:\\Users\\User\\Desktop\\Kaleeswaran\\ElibraryFiles\\prop.properties");
 	Logger logger = LogManager.getLogger(DataSourceProperty.class);
 
 	public BasicDataSource getDataSource() {

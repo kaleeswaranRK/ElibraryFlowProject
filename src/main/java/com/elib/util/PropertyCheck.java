@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class PropertyCheck {
-	static long lastModified;
+	long lastModified;
 	Logger logger = LogManager.getLogger(PropertyCheck.class);
 
 	public void lastmodifyIntialization(File file) {
@@ -16,7 +16,7 @@ public class PropertyCheck {
 		if (lastModified == 0) {
 			lastModified = file.lastModified();
 		} else {
-			logger.info("last Modified" + lastModified);
+			logger.info("last modified already assingned");
 		}
 	}
 

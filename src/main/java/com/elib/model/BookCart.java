@@ -2,10 +2,10 @@ package com.elib.model;
 
 public class BookCart {
 	private int bookCartId;
-	private BookProduct book;
+	private String book;
 	private int quantity;
 	private double price;
-	private User user;
+	private int user;
 
 	@Override
 	public String toString() {
@@ -13,7 +13,7 @@ public class BookCart {
 				+ ", userId=" + user + "]";
 	}
 
-	public BookCart(int bookCartId, BookProduct book, int quantity, double price, User user) {
+	public BookCart(int bookCartId, String book, int quantity, double price, int user) {
 		this.bookCartId = bookCartId;
 		this.book = book;
 		this.quantity = quantity;
@@ -42,19 +42,19 @@ public class BookCart {
 		this.quantity = quantity;
 	}
 
-	public BookProduct getBook() {
+	public String getBook() {
 		return book;
 	}
 
-	public void setBook(BookProduct book) {
+	public void setBook(String book) {
 		this.book = book;
 	}
 
-	public User getUser() {
+	public int getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(int user) {
 		this.user = user;
 	}
 }

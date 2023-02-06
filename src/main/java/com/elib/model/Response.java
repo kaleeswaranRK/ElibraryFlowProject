@@ -32,7 +32,7 @@ public class Response {
 	}
 
 	public void setData(JSONObject json) {
-		this.data = String.valueOf(json);
+		this.data = json.toString();
 	}
 
 	public String getDateTime() {

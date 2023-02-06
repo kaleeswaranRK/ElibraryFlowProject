@@ -6,11 +6,11 @@ public class BookProduct {
 	private String authorName;
 	private int bookQuantity;
 	private double bookPrice;
-	private Category category;
+	private int category;
 
 	
 	public BookProduct(int bookID, String bookName, String authorName, int bookQuantity, double bookPrice,
-			Category category) {
+			int category) {
 		super();
 		this.bookID = bookID;
 		this.bookName = bookName;
@@ -18,10 +18,6 @@ public class BookProduct {
 		this.bookQuantity = bookQuantity;
 		this.bookPrice = bookPrice;
 		this.category = category;
-	}
-
-	public BookProduct() {
-		
 	}
 
 	@Override
@@ -70,11 +66,11 @@ public class BookProduct {
 		this.bookPrice = bookPrice;
 	}
 
-	public Category getcategory() {
+	public int getcategory() {
 		return category;
 	}
 
-	public void setcategory(Category category) {
+	public void setcategory(int category) {
 		this.category = category;
 	}
 }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.elib.model.BookCart;
 import com.elib.model.BookProduct;
 import com.elib.model.Category;
-import com.elib.model.User;
 import com.elib.util.DataSourceProperty;
 
 @Service
@@ -99,31 +98,7 @@ public class Userdboperations {
 		return null;
 	}
 
-	public Category getCategory(int categoryid) {
-		try {
-			logger.info("getCategory method Entry");
-			Connection connection = datasource.getDBConnection();
-			logger.info("DB connection Establised");
-			PreparedStatement prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_CATEGORY @id=?");
-			prepareStatement.setInt(1, categoryid);
-			ResultSet categoryresult = prepareStatement.executeQuery();
-			if (categoryresult.next()) {
-				Category category = new Category(categoryresult.getInt("CATEGORY_ID"),
-						categoryresult.getString("CATEGORY_NAME"));
-				logger.info("getCategory method Exit");
-				return category;
-			} else {
-				return null;
-			}
-
-		} catch (SQLException e) {
-			logger.error(e);
-		} catch (Exception e) {
-			logger.error(e);
-		}
-		return null;
-	}
-
+	
 	public List<BookProduct> getBooksbyCategory(int categoryid) {
 		try {
 			logger.info("get book by Category method Entry");
@@ -135,14 +110,21 @@ public class Userdboperations {
 			prepareStatement.setInt(1, categoryid);
 			ResultSet result = prepareStatement.executeQuery();
 			logger.info("query executed");
-			while (result.next()) {
-				BookProduct book = new BookProduct(result.getInt("BOOK_ID"), result.getString("BOOK_NAME"),
-						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"), result.getDouble("BOOK_PRICE"),
-						getCategory(result.getInt("CATEGORY_ID")));
-				list.add(book);
+			if (result.next()) {
+				while (result.next()) {
+					BookProduct book = new BookProduct(result.getInt("BOOK_ID"), result.getString("BOOK_NAME"),
+							result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"), result.getDouble("BOOK_PRICE"),
+							categoryid);
+					list.add(book);
+				}
+				logger.info("get book by Category method Exit");
+				return list;
 			}
-			logger.info("get book by Category method Exit");
-			return list;
+			else {
+				logger.info("No Data Found");
+				return null;
+			}
+			
 		} catch (SQLException e) {
 			logger.error(e);
 		} catch (Exception e) {
@@ -163,13 +145,8 @@ public class Userdboperations {
 			logger.info("query executed");
 			
 			while (result.next()) {
-				User user= new User(userid,null,null);
-				String bookName = result.getString("BOOK_NAME");
-				System.out.println("BookName = " + bookName);
-				BookProduct book = getBookByName(bookName);
-				System.out.println(book.toString());
-				BookCart cartItem = new BookCart(result.getInt("BOOK_CART_ID"), book, result.getInt("BOOK_QUANTITY"),
-						result.getDouble("BOOK_PRICE"), user);
+				BookCart cartItem = new BookCart(result.getInt("BOOK_CART_ID"), result.getString("BOOK_NAME"), result.getInt("BOOK_QUANTITY"),
+						result.getDouble("BOOK_PRICE"), userid);
 				cartItems.add(cartItem);
 			}
 			logger.info("get cart items method Exit");
@@ -205,6 +182,30 @@ public class Userdboperations {
 		return null;
 
 	}
+	public Category getCategory(int categoryid) {
+		try {
+			logger.info("getCategory method Entry");
+			Connection connection = datasource.getDBConnection();
+			logger.info("DB connection Establised");
+			PreparedStatement prepareStatement = connection.prepareStatement("EXEC KALEESWARAN_GET_CATEGORY @id=?");
+			prepareStatement.setInt(1, categoryid);
+			ResultSet categoryresult = prepareStatement.executeQuery();
+			if (categoryresult.next()) {
+				Category category = new Category(categoryresult.getInt("CATEGORY_ID"),
+						categoryresult.getString("CATEGORY_NAME"));
+				logger.info("getCategory method Exit");
+				return category;
+			} else {
+				return null;
+			}
+
+		} catch (SQLException e) {
+			logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+		return null;
+	}
 
 	public BookProduct getBookByName(String bookName) {
 		try {
@@ -221,7 +222,7 @@ public class Userdboperations {
 			if (result.next()) {
 				book = new BookProduct(result.getInt("BOOK_ID"), result.getString("BOOK_NAME"),
 						result.getString("AUTHOR_NAME"), result.getInt("BOOK_QUANTITY"), result.getDouble("BOOK_PRICE"),
-						getCategory(result.getInt("CATEGORY_ID")));
+						result.getInt("CATEGORY_ID"));
 				logger.info("getBookByName method Exit");
 				return book;
 			} else {
